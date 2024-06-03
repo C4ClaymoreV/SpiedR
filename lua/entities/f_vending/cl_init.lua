@@ -1,6 +1,7 @@
 include("shared.lua")
 
 -- Client-side draw function for the entity
+
 function ENT:Draw()
     self:DrawModel()
 
