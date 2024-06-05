@@ -1,4 +1,4 @@
 VertexLitGeneric
 {
-	$basetexture "vending/flf_v_scr"
+	$basetexture "models/flf/vending/flf_v_scr"
 }
