@@ -5,9 +5,13 @@ local sel = 0
 local buttons = {}
 local button = {}
 
+local function DrawIcon(model)
+
+end
+
 button.Register = function( panel, index, x, y, w, h, text, func )
     buttons[panel] = buttons[panel] or {}
-    buttons[panel][index] = {x= x or 0, y= y or 0, w= w or 0, h= h or 0, text= text or "", func= func or function() return end}
+    buttons[panel][index] = {x= x or 0, y= y or 0, w= w or 0, h= h or 0, text= text or "", func= func or function() end}
 end 
 
 button.Draw = function( panel, index, col)
@@ -40,18 +44,20 @@ button.FindInside = function(panel, pos )
 end
 
 button.Use = function( panel , index )
+    if not buttons[panel][index] then return end
     buttons[panel][index].func()
 end
 
 net.Receive( "vend_use", function () button.Use(pan, sel) end)
 
 button.Register("Background", 0, 0, 0, 85, 500) -- kinda cheating
+button.Register("Background", 1, 0, 0, 412, 939)
 
 
 for i = 1, 8 do -- button registeration
-    button.Register("Main", i,       2, 2 + (i-1)*62,   80, 45, "test",  function() print("you're so awesome") end)
-    button.Register("Main", i + 8,   2, 2 + (i)*62 -15, 56, 13, "buy 1", function() print("you're so awesome") end)
-    button.Register("Main", i + 16, 60, 2 + (i)*62 -15, 22, 13, "5x",    function() print("you're so awesome") end)
+    button.Register("Main", i,       2, 2 + (i - 1)*117,   204, 116, "ITEM",  function() print("you're so awesome") end)
+    button.Register("Main", i + 8,   206, 2 + (i - 1)*117, 204, 58, "BUY 5", function() print("you're so awesome") end)
+    button.Register("Main", i + 16,  206, 2 + (i - 1)*117 + 58, 204, 58, "BUY 10x",    function() print("you're so awesome") end)
 end
 
 function ENT:Draw()
@@ -65,20 +71,31 @@ function ENT:Draw()
 
         button.Draw("Background", 0, Color(21, 21, 21))
 
+        
+
+    
+    cam.End3D2D()
+
+    cam.Start3D2D(self:LocalToWorld( Vector(19, -25, 46.4) ), self:LocalToWorldAngles( Angle(0, 90, 90)), 0.10)
+
+        button.Draw("Background", 1, Color(21, 21, 21))
+
         if dist < 10000 then 
-            local ftrace = util.IntersectRayWithPlane( EyePos(), EyeVector(), self:LocalToWorld( Vector(17.5, 17.5, 32) ), self:LocalToWorldAngles( Angle(0, 90, 90)):Up() )
-            if ftrace == nil then cam.End3D2D() return end
+            local ftrace = util.IntersectRayWithPlane( EyePos(), EyeVector(), self:LocalToWorld( Vector(19, -25, 46.3) ), self:LocalToWorldAngles( Angle(0, 90, 90)):Up() )
+            if ftrace == nil then goto EndSelection end
             ftrace = self:WorldToLocal(ftrace)
         
-            c_pos = { x = (ftrace[2] - 17.5) * 10, y = (-ftrace[3] + 32) * 10 } -- transforms based off of offset and scale for the render hook
+            c_pos = { x = (ftrace[2] + 25) * 10, y = (-ftrace[3] + 46.4) * 10 } -- transforms based off of offset and scale for the render hook
+            if c_pos.x < -10 or c_pos.x > 949 or c_pos.y < -10 or c_pos.y > 422 then goto EndSelection end -- saves the need for a recursive find
 
             sel = button.FindInside(pan, c_pos)
         else sel = 0 end
-
-        if dist > 25000 then cam.End3D2D() return end
+        ::EndSelection::
+        if dist > 25000 then goto EndMainPanel end
 
         button.DrawPanel(pan, Color(50, 50, 50,    phase), function(index) return sel ~= index end)
         button.Draw(pan, sel, Color(100, 100, 100, phase))
 
-	cam.End3D2D()
+        ::EndMainPanel::
+    cam.End3D2D()
 end
