@@ -27,7 +27,7 @@ if SERVER then
         local index = net.ReadInt(5)
         local amt =   net.ReadInt(5)
         local class = game.GetAmmoName( ply:GetActiveWeapon():GetPrimaryAmmoType() )
-        if not whitelist[class] then ply:ChatPrint("Your Weapon's ammo is not on sale!") return
+        if not whitelist[class] and index == 8 then ply:ChatPrint("Your Weapon's ammo is not on sale!") return
         elseif index ~= 8 then class = whitelist[index] end
 
         local price = FLF_VEND[class].price * amt

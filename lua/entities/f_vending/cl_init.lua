@@ -70,12 +70,12 @@ button.Register("Background", 1, 0, 0, 412, 939)
 
 for i, v in pairs( slots ) do
     if i == "Equipt" then
-        button.Register("Equipt", v.index,      2,   2 + (v.index - 1)*117,      204, 116, v.display .. " (" .. v.amt .. ")", 1000, function() button.GenericBuy(v.index, 1 ) end)
-        button.Register("Equipt", v.index + 8,  206, 2 + (v.index - 1)*117,      204, 58,  "BUY 5x" .. " (" .. v.amt*5 .. ")",  1000, function() button.GenericBuy(v.index, 5 ) end)
+        button.Register("Equipt", v.index,      2,   2 + (v.index - 1)*117,      204, 116, v.display .. " (" .. v.amt .. ")", 1000,    function() button.GenericBuy(v.index, 1 ) end)
+        button.Register("Equipt", v.index + 8,  206, 2 + (v.index - 1)*117,      204, 58,  "BUY 5x" ..  " (" .. v.amt*5 .. ")",  1000, function() button.GenericBuy(v.index, 5 ) end)
         button.Register("Equipt", v.index + 16, 206, 2 + (v.index - 1)*117 + 58, 204, 58,  "BUY 10x" .. " (" .. v.amt*10 .. ")", 1000, function() button.GenericBuy(v.index, 10) end)
     else
-        button.Register("Main", v.index,      2,   2 + (v.index - 1)*117,      204, 116, v.display .. " (" .. v.amt .. ")", v.price,      function() button.GenericBuy(v.index, 1 ) end)
-        button.Register("Main", v.index + 8,  206, 2 + (v.index - 1)*117,      204, 58,  "BUY 5x" .. " (" .. v.amt*5 .. ")",  v.price * 5,  function() button.GenericBuy(v.index, 5 ) end)
+        button.Register("Main", v.index,      2,   2 + (v.index - 1)*117,      204, 116, v.display .. " (" .. v.amt .. ")", v.price,         function() button.GenericBuy(v.index, 1 ) end)
+        button.Register("Main", v.index + 8,  206, 2 + (v.index - 1)*117,      204, 58,  "BUY 5x" ..  " (" .. v.amt*5 .. ")",  v.price * 5,  function() button.GenericBuy(v.index, 5 ) end)
         button.Register("Main", v.index + 16, 206, 2 + (v.index - 1)*117 + 58, 204, 58,  "BUY 10x" .. " (" .. v.amt*10 .. ")", v.price * 10, function() button.GenericBuy(v.index, 10) end)
     end
 end
@@ -110,7 +110,7 @@ function ENT:Draw()
         if slots[game.GetAmmoName( LocalPlayer():GetActiveWeapon():GetPrimaryAmmoType() )] then
             button.DrawPanel("Equipt", Color(50, 50, 50,    phase), function(index) return sel ~= index end)
             button.Draw("Equipt", sel, Color(100, 100, 100, phase))
-        else sel = 0 end
+        end
 
         ::EndMainPanel::
     cam.End3D2D()
