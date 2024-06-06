@@ -33,7 +33,8 @@ if SERVER then
         local price = FLF_VEND[class].price * amt
 
         if ply:getDarkRPVar("money") < price then ply:ChatPrint( "You do not have enough money to make this purchase!" ) return end
-        ply:addMoney(-price)
+        if ply:GetAmmoCount(class) >= 9999 then ply:ChatPrint( "You already have the maximum ammo of this type! ") return end
         ply:GiveAmmo(amt * FLF_VEND[class].amt, class)
+        ply:addMoney(-price)
     end)
 end
