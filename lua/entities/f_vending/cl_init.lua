@@ -5,13 +5,9 @@ local sel = 0
 local buttons = {}
 local button = {}
 
-local function DrawIcon(model)
-
-end
-
-button.Register = function( panel, index, x, y, w, h, text, func )
+button.Register = function( panel, index, x, y, w, h, text, price, func )
     buttons[panel] = buttons[panel] or {}
-    buttons[panel][index] = {x= x or 0, y= y or 0, w= w or 0, h= h or 0, text= text or "", func= func or function() end}
+    buttons[panel][index] = {x = x or 0, y = y or 0, w = w or 0, h = h or 0, text = text or "", price = price or 0, func = func or function() end}
 end 
 
 button.Draw = function( panel, index, col)
@@ -24,7 +20,10 @@ button.Draw = function( panel, index, col)
     surface.SetDrawColor(255, 255, 255, col["a"])
     surface.DrawOutlinedRect(b.x, b.y, b.w, b.h)
 
-    draw.DrawText(b.text, nil, b.x + b.w/2, b.y + b.h/2 - 8, Color(255, 255, 255, col["a"]), TEXT_ALIGN_CENTER)
+    draw.DrawText(b.text, "HudDefault", b.x + b.w/2, b.y + b.h/2 - 18, Color(255, 255, 255, col["a"]), TEXT_ALIGN_CENTER)
+    if b.price ~= 0 then 
+        draw.DrawText("$" .. b.price, nil, b.x + b.w/2, b.y + b.h/2 + 6, Color(255, 255, 255, col["a"]), TEXT_ALIGN_CENTER)
+    end
 end
 
 button.DrawPanel = function( panel, col, filter )
@@ -37,7 +36,7 @@ button.DrawPanel = function( panel, col, filter )
     end
 end
 
-button.FindInside = function(panel, pos )
+button.FindInside = function( panel, pos )
     for i, v in pairs(buttons[panel]) do
         if v.x < pos.x and v.x + v.w > pos.x and v.y < pos.y and v.y + v.h > pos.y then return i end
     end
@@ -48,16 +47,22 @@ button.Use = function( panel , index )
     buttons[panel][index].func()
 end
 
+button.GenericBuy = function( index, amount )
+    net.Start("vend_use")
+        net.WriteInt( index,   5 )
+        net.WriteInt( amount, 5 )
+    net.SendToServer()
+end
+
 net.Receive( "vend_use", function () button.Use(pan, sel) end)
 
 button.Register("Background", 0, 0, 0, 85, 500) -- kinda cheating
 button.Register("Background", 1, 0, 0, 412, 939)
 
-
-for i = 1, 8 do -- button registeration
-    button.Register("Main", i,       2, 2 + (i - 1)*117,   204, 116, "ITEM",  function() print("you're so awesome") end)
-    button.Register("Main", i + 8,   206, 2 + (i - 1)*117, 204, 58, "BUY 5", function() print("you're so awesome") end)
-    button.Register("Main", i + 16,  206, 2 + (i - 1)*117 + 58, 204, 58, "BUY 10x",    function() print("you're so awesome") end)
+for i, v in pairs( ENT.Slots ) do
+    button.Register("Main", v.index,      2,   2 + (v.index - 1)*117,      204, 116, v.display, v.price,      function() button.GenericBuy(v.index, 1 ) end)
+    button.Register("Main", v.index + 8,  206, 2 + (v.index - 1)*117,      204, 58,  "BUY 5x",  v.price * 5,  function() button.GenericBuy(v.index, 5 ) end)
+    button.Register("Main", v.index + 16, 206, 2 + (v.index - 1)*117 + 58, 204, 58,  "BUY 10x", v.price * 10, function() button.GenericBuy(v.index, 10) end)
 end
 
 function ENT:Draw()
@@ -66,15 +71,6 @@ function ENT:Draw()
     local dist = LocalPlayer():GetPos():DistToSqr(self:GetPos())
 
     local phase = math.Clamp( 255 - dist/100, 0, 255)
-
-    cam.Start3D2D(self:LocalToWorld( Vector(17.5, 17.5, 32) ), self:LocalToWorldAngles( Angle(0, 90, 90) ), 0.10)
-
-        button.Draw("Background", 0, Color(21, 21, 21))
-
-        
-
-    
-    cam.End3D2D()
 
     cam.Start3D2D(self:LocalToWorld( Vector(19, -25, 46.4) ), self:LocalToWorldAngles( Angle(0, 90, 90)), 0.10)
 
@@ -86,10 +82,12 @@ function ENT:Draw()
             ftrace = self:WorldToLocal(ftrace)
         
             c_pos = { x = (ftrace[2] + 25) * 10, y = (-ftrace[3] + 46.4) * 10 } -- transforms based off of offset and scale for the render hook
-            if c_pos.x < -10 or c_pos.x > 949 or c_pos.y < -10 or c_pos.y > 422 then goto EndSelection end -- saves the need for a recursive find
+            if c_pos.x < -10 or c_pos.x > 422 or c_pos.y < -10 or c_pos.y > 949 then sel = 0 goto EndSelection end -- saves the need for a recursive find
 
             sel = button.FindInside(pan, c_pos)
-        else sel = 0 end
+        else 
+            sel = 0
+        end
         ::EndSelection::
         if dist > 25000 then goto EndMainPanel end
 

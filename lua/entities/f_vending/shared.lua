@@ -7,3 +7,5 @@ ENT.Category = "DarkRP Content" -- The category for this entity in the spawn men
 ENT.Contact = "FloffenWaffles" -- The contact details for the author of this entity.
 ENT.Purpose = "To test the creation of entities." -- The purpose of this entity.
 ENT.Spawnable = true -- Specifies whether this entity can be spawned by players in the spawn menu.
+
+ENT.Slots = FLF_VEND
