@@ -1,7 +1,7 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
-util.AddNetworkString( "vend_use" )
+util.AddNetworkString("vend_use")
 
 -- Server-side initialization function for the entity
 function ENT:Initialize()
@@ -9,8 +9,8 @@ function ENT:Initialize()
     self:PhysicsInit( SOLID_VPHYSICS )
     self:SetMoveType( MOVETYPE_VPHYSICS )
     self:SetSolid( SOLID_VPHYSICS )
-    local phys = self:GetPhysicsObject() 
-    self:SetUseType(SIMPLE_USE)
+    self:SetUseType( SIMPLE_USE )
+    local phys = self:GetPhysicsObject()
     
     if phys:IsValid() then
         phys:Wake()
@@ -18,8 +18,9 @@ function ENT:Initialize()
 end
 
 if SERVER then
-    function ENT:Use(ply)
-        net.Start("vend_use")
-        net.Send(ply)
+    function ENT:Use( ply, user )
+        if user ~= ply then return end -- naughty user exploits will never be a thing
+        net.Start( "vend_use" )
+        net.Send( ply )
     end
 end
