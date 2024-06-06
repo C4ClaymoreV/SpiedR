@@ -6,5 +6,6 @@ VertexLitGeneric
 	$phong 1
 	$phongexponenttexture "models/flf/vending/flf_v_rough"
 	$phongfresnelranges "[0.5 0.75 1]"
-	$basemapalphaphongmask 1
+	$phongtint "[0.27 0.27 0.27]"
+	$phongboost 0.41
 }
